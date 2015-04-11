@@ -6,6 +6,7 @@ Set up your Raspberry Pi in a room, hook it up to some speakers and position the
 ## Requirements
 
 * Raspberry Pi camera module, connected and enabled
+* bottle python module (installable through pip)
 * pyttsx python module (installable through pip)
 * espeak package (installable through apt-get)
 * mplayer package (installable through apt-get)
