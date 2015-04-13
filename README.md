@@ -11,6 +11,11 @@ Set up your Raspberry Pi in a room, hook it up to some speakers and position the
 * espeak package (installable through apt-get)
 * mplayer package (installable through apt-get)
 
+## Features
+* Email checking
+* Quiet hours (from 9:00 PM to 6:00 AM)
+* Ability to upload music
+
 In main.py make sure to put in your own IMAP credentials so that your email can be checked.
 
 To make the server run at start, make an /etc/init.d/ script. The following link can be helpful: [https://www.debian-administration.org/article/28/Making_scripts_run_at_boot_time_with_Debian](https://www.debian-administration.org/article/28/Making_scripts_run_at_boot_time_with_Debian)
