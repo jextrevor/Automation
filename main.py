@@ -25,26 +25,27 @@ camera = picamera.PiCamera()
 GPIO.setmode(GPIO.BCM)
 CAMLED = 5
 GPIO.setup(CAMLED, GPIO.OUT, initial=False)
+stylestring = "<style>html * {font-size:72}</style>"
 #app = Flask(__name__)
 #d = cherrypy.wsgiserver.WSGIPathInfoDispatcher({'/':app})
 #server = cherrypi.wsgiserver.CherryPyWSGIServer(('0.0.0.0',80),d)
 @route("/")
 def home():
-    return template("<h1>Music Server</h1><p>{{hour}}:{{minute}}</p><p><a href='/alarm'>Alarm</a></p><p><a href='/music'>Music</a></p><p><a href='/upload'>Upload</a></p><p><a href='/delete'>Delete</a></p><p><a href='/restart'>Reboot</a></p><p><a href='/power'>Shutdown</a></p>", hour=datetime.datetime.now().hour,minute=datetime.datetime.now().minute)
+    return stylestring + template("<h1>Music Server</h1><p>{{hour}}:{{minute}}</p><p><a href='/alarm'>Alarm</a></p><p><a href='/alarm2'>Reminder</a></p><p><a href='/music'>Music</a></p><p><a href='/upload'>Upload</a></p><p><a href='/delete'>Delete</a></p><p><a href='/restart'>Reboot</a></p><p><a href='/power'>Shutdown</a></p>", hour=datetime.datetime.now().hour,minute=datetime.datetime.now().minute)
 @route("/music")
 def music():
     global musicnum
     if occupied == True:
-        return template("<h1>Music</h1><p>Currently playing {{file}}</p><p><a href='/stop'>Stop</a></p><p><a href='/'>Home</a></p>", file=sorted(os.listdir("music/"))[musicnum])
+        return stylestring + template("<h1>Music</h1><p>Currently playing {{file}}</p><p><a href='/stop'>Stop</a></p><p><a href='/'>Home</a></p>", file=sorted(os.listdir("music/"))[musicnum])
     if len(os.listdir("music/")) == 0:
         return "<h1>Music</h1><p>Nothing to play. Please upload some music.</p><a href='/'>Home</a>"
     if musicnum+1 >= len(os.listdir("music/")):
-        return template("<h1>Music</h1><p>Currently not playing. Next up {{file}}</p><p><a href='/play'>Play</a></p><p><a href='/'>Home</a></p>", file=sorted(os.listdir("music/"))[0])
-    return template("<h1>Music</h1><p>Currently not playing. Next up {{file}}</p><p><a href='/play'>Play</a></p><p><a href='/'>Home</a></p>", file=sorted(os.listdir("music/"))[musicnum+1])
+        return stylestring + template("<h1>Music</h1><p>Currently not playing. Next up {{file}}</p><p><a href='/play'>Play</a></p><p><a href='/'>Home</a></p>", file=sorted(os.listdir("music/"))[0])
+    return stylestring + template("<h1>Music</h1><p>Currently not playing. Next up {{file}}</p><p><a href='/play'>Play</a></p><p><a href='/'>Home</a></p>", file=sorted(os.listdir("music/"))[musicnum+1])
 @route("/alarm")
 def alarm():
     global hour, minute, alarmset
-    return template("<h1>Alarm</h1><p>Alarm status: {{alarmset}}</p><p>Alarm set for {{hour}}:{{minute}}</p><a href='/on'>Turn alarm on</a><br /><a href='/off'>Turn alarm off</a><br /><a href='/set'>Set alarm time</a>", alarmset=alarmset, hour=hour, minute=minute)
+    return stylestring + template("<h1>Alarm</h1><p>Alarm status: {{alarmset}}</p><p>Alarm set for {{hour}}:{{minute}}</p><a href='/on'>Turn alarm on</a><br /><a href='/off'>Turn alarm off</a><br /><a href='/set'>Set alarm time</a>", alarmset=alarmset, hour=hour, minute=minute)
 @route("/on")
 def on():
     global alarmset
@@ -103,7 +104,7 @@ def turnoff():
 @route("/alarm2")
 def alarm():
     global hour2, minute2, reminder, remindertext
-    return template("<h1>Reminder</h1><p>Reminder status: {{reminder}}</p><p>Reminder set for {{hour2}}:{{minute2}}</p><p>Reminder text is {{remindertext}}</p><a href='/on2'>Turn reminder on</a><br /><a href='/off2'>Turn reminder off</a><br /><a href='/set2'>Set reminder time</a><br /><a href='/set3'>Set reminder text</a><br /><a href='/'>Back to home</a>", reminder=reminder,remindertext=remindertext, hour2=hour2, minute2=minute2)
+    return stylestring + template("<h1>Reminder</h1><p>Reminder status: {{reminder}}</p><p>Reminder set for {{hour2}}:{{minute2}}</p><p>Reminder text is {{remindertext}}</p><a href='/set2'>Set reminder time</a><br /><a href='/set3'>Set reminder text</a><br /><a href='/'>Back to home</a>", reminder=reminder,remindertext=remindertext, hour2=hour2, minute2=minute2)
 @route("/on2")
 def on():
     global reminder
@@ -130,7 +131,7 @@ def settext():
 def textset():
     global remindertext
     remindertext = request.forms.get('newtext')
-    return "<p>Reminder text set. <a href='/'>Home</a></p>"
+    return "<p>Reminder text set. Reminder turned ON. <a href='/'>Home</a></p>"
 # Capture a small test image (for motion detection)
 def captureTestImage():
     camera.resolution = (50, 25)
@@ -158,6 +159,7 @@ def alarmthread():
             engine = pyttsx.init()
             engine.say(remindertext)
             engine.runAndWait()
+            reminder = False
 def motionthread():
     global buffer1, occupied, hour, musicprocess, minute, alarmset
     while True:
