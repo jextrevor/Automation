@@ -20,7 +20,7 @@ from PIL import Image
 # Threshold (how much a pixel has to change by to be marked as "changed")
 # Sensitivity (how many changed pixels before action is taken)
 threshold = 20
-sensitivity = 20
+sensitivity = 10
 camera = picamera.PiCamera()
 GPIO.setmode(GPIO.BCM)
 CAMLED = 5
