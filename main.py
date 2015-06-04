@@ -129,7 +129,8 @@ def settext():
     return "<form action='/text' method='post'>Text:<input type='text' name='newtext' /><input type='submit' value='Set' /></form>"
 @route("/text", method='POST')
 def textset():
-    global remindertext
+    global remindertext, reminder
+    reminder = True
     remindertext = request.forms.get('newtext')
     return "<p>Reminder text set. Reminder turned ON. <a href='/'>Home</a></p>"
 # Capture a small test image (for motion detection)
