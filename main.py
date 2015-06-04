@@ -38,7 +38,7 @@ def music():
     if occupied == True:
         return stylestring + template("<h1>Music</h1><p>Currently playing {{file}}</p><p><a href='/stop'>Stop</a></p><p><a href='/'>Home</a></p>", file=sorted(os.listdir("music/"))[musicnum])
     if len(os.listdir("music/")) == 0:
-        return "<h1>Music</h1><p>Nothing to play. Please upload some music.</p><a href='/'>Home</a>"
+        return stylestring + "<h1>Music</h1><p>Nothing to play. Please upload some music.</p><a href='/'>Home</a>"
     if musicnum+1 >= len(os.listdir("music/")):
         return stylestring + template("<h1>Music</h1><p>Currently not playing. Next up {{file}}</p><p><a href='/play'>Play</a></p><p><a href='/'>Home</a></p>", file=sorted(os.listdir("music/"))[0])
     return stylestring + template("<h1>Music</h1><p>Currently not playing. Next up {{file}}</p><p><a href='/play'>Play</a></p><p><a href='/'>Home</a></p>", file=sorted(os.listdir("music/"))[musicnum+1])
@@ -50,57 +50,57 @@ def alarm():
 def on():
     global alarmset
     alarmset = True
-    return "<p>Alarm on. <a href='/'>Home</a></p>"
+    return stylestring + "<p>Alarm on. <a href='/'>Home</a></p>"
 @route("/off")
 def off():
     global alarmset
     alarmset = False
-    return "<p>Alarm off. <a href='/'>Home</a></p>"
+    return stylestring + "<p>Alarm off. <a href='/'>Home</a></p>"
 @route("/set")
 def set():
-    return "<form action='/time' method='post'>Hour:<input type='text' name='hour' />Minute:<input type='text' name='minute' /><input type='submit' value='Set' /></form>"
+    return stylestring + "<form action='/time' method='post'>Hour:<input type='text' name='hour' />Minute:<input type='text' name='minute' /><input type='submit' value='Set' /></form>"
 @route("/time", method='POST')
 def setalarm():
     global hour, minute
     hour = int(request.forms.get('hour'))
     minute = int(request.forms.get('minute'))
-    return "<p>Alarm set. <a href='/'>Home</a></p>"
+    return stylestring + "<p>Alarm set. <a href='/'>Home</a></p>"
 @route("/play")
 def play():
     global occupied
     music()
     occupied=True
-    return "<p>Music started</p><p><a href='/'>Home</a></p>"
+    return stylestring + "<p>Music started</p><p><a href='/'>Home</a></p>"
 @route("/stop")
 def stop():
     global occupied,musicprocess
     occupied = False
     musicprocess.stdin.write("q")
-    return "<p>Music stopped</p><p><a href='/'>Home</a></p>"
+    return stylestring + "<p>Music stopped</p><p><a href='/'>Home</a></p>"
 @route("/upload")
 def upload():
-    return "<form action='/save' method='post' enctype='multipart/form-data'><input type='file' name='upload[]' multiple /><input type='submit' value='Upload' /></form>"
+    return stylestring + "<form action='/save' method='post' enctype='multipart/form-data'><input type='file' name='upload[]' multiple /><input type='submit' value='Upload' /></form>"
 @route("/save",method='POST')
 def save():
     upload = request.files.getlist('upload[]')
     for u in upload:
         u.save("music/")
-    return "<p>Upload successful. <a href='/'>Home</a></p>"
+    return stylestring + "<p>Upload successful. <a href='/'>Home</a></p>"
 @route("/delete")
 def delete():
     global musicnum
     os.system("rm -rfv music/")
     os.system("mkdir music")
     musicnum = 0
-    return "<p>Cleared music folder. <a href='/'>Home</a></p>"
+    return stylestring + "<p>Cleared music folder. <a href='/'>Home</a></p>"
 @route("/restart")
 def restart():
     os.system("sudo reboot")
-    return "<p>Rebooting... please wait</p>"
+    return stylestring + "<p>Rebooting... please wait</p>"
 @route("/power")
 def turnoff():
     os.system("sudo shutdown -h now")
-    return "<p>Shutting down...</p>"
+    return stylestring + "<p>Shutting down...</p>"
 @route("/alarm2")
 def alarm():
     global hour2, minute2, reminder, remindertext
@@ -109,30 +109,30 @@ def alarm():
 def on():
     global reminder
     reminder = True
-    return "<p>Reminder on. <a href='/'>Home</a></p>"
+    return stylestring + "<p>Reminder on. <a href='/'>Home</a></p>"
 @route("/off2")
 def off():
     global reminder
     reminder = False
-    return "<p>Reminder off. <a href='/'>Home</a></p>"
+    return stylestring + "<p>Reminder off. <a href='/'>Home</a></p>"
 @route("/set2")
 def set():
-    return "<form action='/time2' method='post'>Hour:<input type='text' name='hour' />Minute:<input type='text' name='minute' /><input type='submit' value='Set' /></form>"
+    return stylestring + "<form action='/time2' method='post'>Hour:<input type='text' name='hour' />Minute:<input type='text' name='minute' /><input type='submit' value='Set' /></form>"
 @route("/time2", method='POST')
 def setalarm():
     global hour2, minute2
     hour2 = int(request.forms.get('hour'))
     minute2 = int(request.forms.get('minute'))
-    return "<p>Reminder set. <a href='/'>Home</a></p>"
+    return stylestring + "<p>Reminder set. <a href='/'>Home</a></p>"
 @route("/set3")
 def settext():
-    return "<form action='/text' method='post'>Text:<input type='text' name='newtext' /><input type='submit' value='Set' /></form>"
+    return stylestring + "<form action='/text' method='post'>Text:<input type='text' name='newtext' /><input type='submit' value='Set' /></form>"
 @route("/text", method='POST')
 def textset():
     global remindertext, reminder
     reminder = True
     remindertext = request.forms.get('newtext')
-    return "<p>Reminder text set. Reminder turned ON. <a href='/'>Home</a></p>"
+    return stylestring + "<p>Reminder text set. Reminder turned ON. <a href='/'>Home</a></p>"
 # Capture a small test image (for motion detection)
 def captureTestImage():
     camera.resolution = (50, 25)
