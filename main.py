@@ -154,7 +154,7 @@ def chatthread():
     pass
 
 def alarmthread():
-    global hour2, minute2, reminder
+    global hour2, minute2, reminder, remindertext
     while True:
         if datetime.datetime.now().hour == hour2 and datetime.datetime.now().minute == minute2 and reminder == True:
             engine = pyttsx.init()
