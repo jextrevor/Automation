@@ -102,30 +102,30 @@ def turnoff():
     os.system("sudo shutdown -h now")
     return stylestring + "<p>Shutting down...</p>"
 @route("/alarm2")
-def alarm():
+def alarm2():
     global hour2, minute2, reminder, remindertext
     return stylestring + template("<h1>Reminder</h1><p>Reminder status: {{reminder}}</p><p>Reminder set for {{hour2}}:{{minute2}}</p><p>Reminder text is {{remindertext}}</p><a href='/set2'>Set reminder time</a><br /><a href='/set3'>Set reminder text</a><br /><a href='/'>Back to home</a>", reminder=reminder,remindertext=remindertext, hour2=hour2, minute2=minute2)
 @route("/on2")
-def on():
+def on2():
     global reminder
     reminder = True
     return stylestring + "<p>Reminder on. <a href='/'>Home</a></p>"
 @route("/off2")
-def off():
+def off2():
     global reminder
     reminder = False
     return stylestring + "<p>Reminder off. <a href='/'>Home</a></p>"
 @route("/set2")
-def set():
+def set2():
     return stylestring + "<form action='/time2' method='post'>Hour:<input type='text' name='hour' />Minute:<input type='text' name='minute' /><input type='submit' value='Set' /></form>"
 @route("/time2", method='POST')
-def setalarm():
+def setalarm2():
     global hour2, minute2
     hour2 = int(request.forms.get('hour'))
     minute2 = int(request.forms.get('minute'))
     return stylestring + "<p>Reminder set. <a href='/'>Home</a></p>"
 @route("/set3")
-def settext():
+def settext3():
     return stylestring + "<form action='/text' method='post'>Text:<input type='text' name='newtext' /><input type='submit' value='Set' /></form>"
 @route("/text", method='POST')
 def textset():
@@ -249,9 +249,9 @@ musicnum = len(os.listdir("music/")) -1
 motion = threading.Thread(target=motionthread)
 motion.daemon = True
 motion.start()
-alarm = threading.Thread(target=alarmthread)
-alarm.daemon = True
-alarm.start()
+alarma = threading.Thread(target=alarmthread)
+alarma.daemon = True
+alarma.start()
 #if __name__ == "__main__":
 #if __name__ == "__main__":
 #    try:
