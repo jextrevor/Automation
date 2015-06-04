@@ -7,6 +7,9 @@ import time
 import datetime
 import pyttsx
 import imaplib
+import pywapi
+import unicodedata
+import RPi.GPIO as GPIO
 from bottle import route, run, template, request
 #from pydub import AudioSegment
 #import cherrypy.wsgiserver
@@ -19,6 +22,9 @@ from PIL import Image
 threshold = 20
 sensitivity = 20
 camera = picamera.PiCamera()
+GPIO.setmode(GPIO.BCM)
+CAMLED = 5
+GPIO.setup(CAMLED, GPIO.OUT, initial=False)
 #app = Flask(__name__)
 #d = cherrypy.wsgiserver.WSGIPathInfoDispatcher({'/':app})
 #server = cherrypi.wsgiserver.CherryPyWSGIServer(('0.0.0.0',80),d)
@@ -94,6 +100,37 @@ def restart():
 def turnoff():
     os.system("sudo shutdown -h now")
     return "<p>Shutting down...</p>"
+@route("/alarm2")
+def alarm():
+    global hour2, minute2, reminder, remindertext
+    return template("<h1>Reminder</h1><p>Reminder status: {{reminder}}</p><p>Reminder set for {{hour2}}:{{minute2}}</p><p>Reminder text is {{remindertext}}</p><a href='/on2'>Turn reminder on</a><br /><a href='/off2'>Turn reminder off</a><br /><a href='/set2'>Set reminder time</a><br /><a href='/set3'>Set reminder text</a><br /><a href='/'>Back to home</a>", reminder=reminder,remindertext=remindertext, hour2=hour2, minute2=minute2)
+@route("/on2")
+def on():
+    global reminder
+    reminder = True
+    return "<p>Reminder on. <a href='/'>Home</a></p>"
+@route("/off2")
+def off():
+    global reminder
+    reminder = False
+    return "<p>Reminder off. <a href='/'>Home</a></p>"
+@route("/set2")
+def set():
+    return "<form action='/time2' method='post'>Hour:<input type='text' name='hour' />Minute:<input type='text' name='minute' /><input type='submit' value='Set' /></form>"
+@route("/time2", method='POST')
+def setalarm():
+    global hour2, minute2
+    hour2 = int(request.forms.get('hour'))
+    minute2 = int(request.forms.get('minute'))
+    return "<p>Reminder set. <a href='/'>Home</a></p>"
+@route("/set3")
+def settext():
+    return "<form action='/text' method='post'>Text:<input type='text' name='newtext' /><input type='submit' value='Set' /></form>"
+@route("/text", method='POST')
+def textset():
+    global remindertext
+    remindertext = request.forms.get('newtext')
+    return "<p>Reminder text set. <a href='/'>Home</a></p>"
 # Capture a small test image (for motion detection)
 def captureTestImage():
     camera.resolution = (50, 25)
@@ -114,8 +151,13 @@ buffer1 = captureTestImage()
 def chatthread():
     pass
 
-def emailthread():
-    pass
+def alarmthread():
+    global hour2, minute2, reminder
+    while True:
+        if datetime.datetime.now().hour == hour2 and datetime.datetime.now().minute == minute2 and reminder == True:
+            engine = pyttsx.init()
+            engine.say(remindertext)
+            engine.runAndWait()
 def motionthread():
     global buffer1, occupied, hour, musicprocess, minute, alarmset
     while True:
@@ -135,6 +177,10 @@ def motionthread():
         if changedPixels > sensitivity:
             action()
         if datetime.datetime.now().hour == hour and datetime.datetime.now().minute == minute and alarmset == True:
+            forecasttext = unicodedata.normalize('NFKD', pywapi.get_weather_from_yahoo('84003', '')['forecasts'][0]['text']).encode('ascii','ignore')
+            engine = pyttsx.init()
+            engine.say("The weather today is "+forecasttext)
+            engine.runAndWait()
             music()
             occupied = True
         # Swap comparison buffers
@@ -153,15 +199,18 @@ def motionthread():
 def action():
     global occupied
     if datetime.datetime.now().hour < 21 and datetime.datetime.now().hour >= 6:
+        GPIO.output(CAMLED,True)
         imap = imaplib.IMAP4_SSL("imap.gmail.com",'993')
         imap.login("youremail@gmail.com","password")
         imap.select()
         imap.check()
         unread = len(imap.search(None,'UnSeen')[1][0].split())
         imap.logout()
-        engine = pyttsx.init()
-        engine.say("You have "+str(unread)+" new emails.")
-        engine.runAndWait()
+        if unread > 0:
+            engine = pyttsx.init()
+            engine.say("You have "+str(unread)+" new emails.")
+            engine.runAndWait()
+        GPIO.output(CAMLED,False)
         music()
         occupied = True
         #occupiedtimer.cancel()
@@ -183,9 +232,13 @@ def music():
 # Begin start of server
 occupied = False
 musicprocess = None
-hour = 10
-minute = 37
-alarmset = True
+hour = 0
+minute = 0
+hour2 = 0
+minute2 = 0
+reminder = False
+remindertext = ""
+alarmset = False
 musicnum = len(os.listdir("music/")) -1
 #occupiedtimer = threading.Timer(10,leave)
 #occupiedtimer.start()
@@ -193,9 +246,9 @@ musicnum = len(os.listdir("music/")) -1
 motion = threading.Thread(target=motionthread)
 motion.daemon = True
 motion.start()
-#alarm = threading.Thread(target=alarmthread)
-#alarm.daemon = True
-#alarm.start()
+alarm = threading.Thread(target=alarmthread)
+alarm.daemon = True
+alarm.start()
 #if __name__ == "__main__":
 #if __name__ == "__main__":
 #    try:
