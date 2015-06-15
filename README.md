@@ -1,6 +1,8 @@
 # Automation
 A Raspberry Pi automated alarm clock/music server.
 
+RUN AT YOUR OWN RISK. This project is pretty buggy. If you want a more stable release check out [this commit](https://github.com/jextrevor/Automation/commit/97a6b731f8734e6da3231d26f437e452f653cf7e)
+
 Set up your Raspberry Pi in a room, hook it up to some speakers and position the camera so that a large area of the room is visible. When you walk into the room, your Raspberry Pi will tell you how many emails you have and will start playing music.
 
 ## Requirements
